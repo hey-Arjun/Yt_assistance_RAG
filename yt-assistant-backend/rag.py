@@ -114,30 +114,4 @@ def build_rag_chain(retriever):
     )
 
     return chain
-def build_rag_chain(retriever):
-    llm = ChatOpenAI(
-        model="gpt-3.5-turbo",
-        temperature=0.2
-    )
-
-    prompt = PromptTemplate(
-        template=PROMPT_TEMPLATE,
-        input_variables=["context", "question"]
-    )
-
-    chain = (
-        RunnableParallel(
-            {
-                "context": retriever | format_docs,
-                "question": RunnablePassthrough(),
-            }
-        )
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
-
-    return chain
-
-
 
