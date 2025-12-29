@@ -1,10 +1,11 @@
 # Yt_assistance_RAG
 
-# 🎥 YTAssistant – Intelligent YouTube Video Assistant
+## 🎥 YTAssistant – Intelligent YouTube Video Assistant
 YTAssistant is a production-grade YouTube AI Assistant built as a Chrome extension with a FastAPI backend.
 It enables users to ask context-aware questions about any YouTube video and receive accurate, structured answers using transcript-based Retrieval-Augmented Generation (RAG), with robust fallbacks when transcripts are unavailable.
 
-✨ Key Features
+# ✨ Key Features
+
 🔹 Chrome Extension (Frontend)
 Floating robot UI injected on YouTube pages
 Click-to-open chat panel without affecting page layout
@@ -26,22 +27,19 @@ Deterministic output formatting for lists and questions
 
 The system is divided into three clean layers:
 
-Chrome Extension
-
+1)Chrome Extension
 content/ → UI rendering and user interaction
 
 background/ → API communication and client identity handling
 
-Backend (FastAPI)
-
+2)Backend (FastAPI)
 API layer for request handling
 
 Service layer for transcript, metadata, quota, and context building
 
 RAG pipeline for intelligent retrieval and answering
 
-External Services
-
+3)External Services
 YouTube Data API (metadata, comments)
 
 YouTube Transcript API (captions)
@@ -51,11 +49,11 @@ LLM for reasoning and summarization
 Vector database (FAISS) for retrieval
 
 
-📌 See full architecture diagram here:
+# 📌 See full architecture diagram here:
 
 docs/architecture.png
 
-🚀 Setup & Run
+# 🚀 Setup & Run
 
 cd backend
 
@@ -77,13 +75,13 @@ Click Load unpacked
 Select the extension/ folder
 
 
-📄 License
+# 📄 License
 
 This project is for educational and portfolio purposes.
 
 YouTube content access respects platform limitations and availability.
 
-👤 Author
+# 👤 Author
 
 Built by Arjun
 
