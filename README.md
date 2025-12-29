@@ -23,24 +23,36 @@ Vector store caching for performance
 Deterministic output formatting for lists and questions
 
 # 🏗 System Architecture
+
 The system is divided into three clean layers:
 
 Chrome Extension
+
 content/ → UI rendering and user interaction
+
 background/ → API communication and client identity handling
 
 Backend (FastAPI)
+
 API layer for request handling
+
 Service layer for transcript, metadata, quota, and context building
+
 RAG pipeline for intelligent retrieval and answering
 
 External Services
+
 YouTube Data API (metadata, comments)
+
 YouTube Transcript API (captions)
+
 LLM for reasoning and summarization
+
 Vector database (FAISS) for retrieval
 
+
 📌 See full architecture diagram here:
+
 docs/architecture.png
 
 🚀 Setup & Run
