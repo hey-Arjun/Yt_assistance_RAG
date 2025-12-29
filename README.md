@@ -43,54 +43,36 @@ Vector database (FAISS) for retrieval
 📌 See full architecture diagram here:
 docs/architecture.png
 
-
-
-## Project Structure
-
-project_skill/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── services/
-│   │   ├── rag/
-│   │   ├── core/
-│   │   ├── schemas/
-│   │   └── main.py
-│   └── requirements.txt
-│
-├── extension/
-│   ├── content/
-│   ├── background/
-│   ├── assets/
-│   └── manifest.json
-│
-├── docs/
-│   └── architecture.png
-│
-└── README.md
-
-
-
-
 🚀 Setup & Run
 
 cd backend
+
 python -m venv venv
+
 source venv/bin/activate
+
 pip install -r requirements.txt
+
 uvicorn app.main:app --reload
 
 # Chrome Extension
 Open Chrome → chrome://extensions
+
 Enable Developer mode
+
 Click Load unpacked
+
 Select the extension/ folder
 
 
 📄 License
+
 This project is for educational and portfolio purposes.
+
 YouTube content access respects platform limitations and availability.
 
 👤 Author
+
 Built by Arjun
+
 Focused on AI systems, RAG architectures, and real-world product engineering.
