@@ -1,6 +1,5 @@
 # app/main.py
-
-import app.config  # loads .env
+import app.config  
 
 from fastapi import FastAPI
 from app.api.ask import router as ask_router
