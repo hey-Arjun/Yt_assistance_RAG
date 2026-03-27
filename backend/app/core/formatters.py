@@ -13,3 +13,4 @@ def enforce_linewise_numbering(text: str) -> str:
     cleaned = [m.strip() for m in matches]
 
     return "\n".join(cleaned)
+
