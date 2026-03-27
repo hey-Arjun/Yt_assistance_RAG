@@ -1,0 +1,67 @@
+import logging
+import os
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_community.vectorstores import Chroma
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+logger = logging.getLogger(__name__)
+
+class RAGService:
+    def __init__(self):
+        self.embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+        self.db_path = "chroma_db"
+        self.vector_db = Chroma(
+            persist_directory=self.db_path,
+            embedding_function=self.embeddings,
+            collection_name="youtube_assistant"
+        )
+        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2) # mini is cheaper/better than 3.5
+
+    def ingest_video(self, video_id: str, text: str):
+        """Replaces chunking.py and vector_store.py logic"""
+        # Check if already exists to save money
+        existing = self.vector_db.get(where={"video_id": video_id})
+        if existing and len(existing['ids']) > 0:
+            return True
+
+        # From your chunking.py
+        splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
+        chunks = splitter.split_text(text)
+        
+        # Metadata is key for multi-video support
+        metadatas = [{"video_id": video_id} for _ in chunks]
+        self.vector_db.add_texts(texts=chunks, metadatas=metadatas)
+        return True
+
+    def get_answer(self, video_id: str, question: str):
+        """Replaces retriever.py logic with a filtered chain"""
+        # Create a filtered retriever so it only looks at THIS video
+        retriever = self.vector_db.as_retriever(
+            search_kwargs={"k": 4, "filter": {"video_id": video_id}}
+        )
+
+        template = """
+        You are a helpful assistant answering questions based only on the provided context.
+        Context: {context}
+        Question: {question}
+        Instructions:
+        - Answer clearly and concisely.
+        - If the answer is not in the context, say "I don't know based on this video".
+        """
+        prompt = PromptTemplate.from_template(template)
+
+        # The LangChain LCEL Chain
+        chain = (
+            RunnableParallel({
+                "context": retriever | (lambda docs: "\n\n".join(d.page_content for d in docs)),
+                "question": RunnablePassthrough(),
+            })
+            | prompt
+            | self.llm
+            | StrOutputParser()
+        )
+
+        return chain.invoke(question)

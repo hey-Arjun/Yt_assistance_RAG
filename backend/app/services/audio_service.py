@@ -2,7 +2,7 @@ import os
 import yt_dlp
 import logging
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # ensure a tempopary dir exists for audio files
 TEMP_DIR = "temp_audio"
@@ -30,7 +30,7 @@ def download_audio(video_url: str) -> str:
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=True)
-            audio_path = ydlp.prepare_filename(info)
+            audio_path = ydl.prepare_filename(info)
 
             # yt-dlp might change the extension during post-processing
             # We ensure we return the actual path on disk

@@ -1,12 +1,12 @@
 import logging
 
 # Standardize imports
-from services.transcript_service import get_video_transcript
-from services.audio_service import download_audio, cleanup_audio # Added cleanup
-from services.asr_service import transcribe_audio
-from services.cache_service import get_cached_data, set_cache_data
-from services.comment_processor import process_comments
-from services.youtube_service import get_video_metadata 
+from app.services.transcript_service import get_video_transcript
+from app.services.audio_service import download_audio, cleanup_audio # Added cleanup
+from app.services.asr_service import transcribe_audio
+from app.services.cache_service import get_cached_data, set_cache_data
+from app.services.comment_processor import process_comments
+from app.services.youtube_service import get_video_metadata 
 
 logger = logging.getLogger(__name__)
 

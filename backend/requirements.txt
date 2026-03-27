@@ -7,3 +7,5 @@ faiss-cpu
 youtube-transcript-api
 python-dotenv
 tiktoken
+yt_dlp
+langchain-openai
