@@ -82,7 +82,7 @@ export function toggleAssistantPanel() {
       font-weight: 800;
     }
 
-    .msg { padding: 10px 14px; border-radius: 15px; max-width: 85%; font-size: 13px; line-height: 1.4; word-wrap: break-word; }
+    .msg { padding: 10px 14px; border-radius: 15px; max-width: 85%; font-size: 13px; line-height: 1.4; word-wrap: break-word; margin-bottom: 5px; }
     .user-msg { background: #6405e0; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
     .bot-msg { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #dee2e6; }
   `;
@@ -90,7 +90,7 @@ export function toggleAssistantPanel() {
 
   panel.innerHTML = `
     <div id="yt-header">
-        <span id="yt-header-title">YouTube AI Assistant</span>
+        <span id="yt-header-title">Trippi</span>
         <span id="yt-close-btn">×</span>
     </div>
     <div id="yt-assistant-chat"></div>
@@ -102,7 +102,6 @@ export function toggleAssistantPanel() {
 
   document.body.appendChild(panel);
 
-  // --- Selectors ---
   const header = panel.querySelector("#yt-header");
   const closeBtn = panel.querySelector("#yt-close-btn");
   const chatContainer = panel.querySelector("#yt-assistant-chat");
@@ -140,7 +139,6 @@ export function toggleAssistantPanel() {
     document.addEventListener("mouseup", onMouseUp);
   });
 
-  // --- Functions ---
   closeBtn.addEventListener("click", () => panel.remove());
 
   function addMessage(text, isUser = false) {
@@ -156,33 +154,74 @@ export function toggleAssistantPanel() {
     const question = input.value.trim();
     if (!question) return;
 
+    // 1. Show User Message Immediately
+    addMessage(question, true);
+
+    // 2. Clear and disable input
     input.value = "";
     input.disabled = true;
-    addMessage(question, true);
-    const thinkingMsg = addMessage("Thinking...", false);
+
+    // 3. Prepare Bot Placeholder
+    const botMsg = addMessage("Thinking...", false);
+    let fullText = "";
 
     try {
-      const videoId = getVideoID();
-      chrome.runtime.sendMessage({ type: "ASK_VIDEO", video_id: videoId, question }, (res) => {
-        if (chrome.runtime.lastError) {
-          thinkingMsg.textContent = "❌ Connection Error";
-        } else if (res?.ok) {
-          thinkingMsg.textContent = res.data.answer;
-        } else {
-          thinkingMsg.textContent = "❌ " + (res?.error || "Error");
+        const videoId = getVideoID();
+        const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        
+        let storage = await chrome.storage.local.get("client_id");
+        let client_id = storage.client_id;
+
+        if (!client_id) {
+            client_id = crypto.randomUUID();
+            await chrome.storage.local.set({ client_id });
         }
+
+      const port = chrome.runtime.connect({ name: "streaming-chat" });
+
+      port.postMessage({
+          type: "START_STREAM",
+          payload: { 
+              video_id: videoId, 
+              video_url: videoUrl, 
+              question: question,
+              client_id: client_id   
+          }
       });
+
+      port.onMessage.addListener((msg) => {
+          if (msg.type === "CHUNK") {
+              // Clear "Thinking..." only on first chunk arrival
+              if (fullText === "") {
+                  botMsg.textContent = "";
+              }
+              fullText += msg.text;
+              botMsg.textContent = fullText; 
+              chatContainer.scrollTop = chatContainer.scrollHeight;
+          } else if (msg.type === "ERROR") {
+              botMsg.textContent = "❌ " + msg.error;
+              input.disabled = false;
+              port.disconnect();
+          } else if (msg.type === "DONE") {
+              input.disabled = false;
+              input.focus();
+              port.disconnect();
+          }
+      });
+
+      port.onDisconnect.addListener(() => {
+        input.disabled = false;
+      });
+
     } catch (err) {
-      thinkingMsg.textContent = "❌ " + err.message;
-    } finally {
+      botMsg.textContent = "❌ " + err.message;
       input.disabled = false;
-      input.focus();
     }
   }
 
   sendButton.addEventListener("click", sendMessage);
   input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
-  addMessage("Hi! I'm updated with your new purple theme. How can I help?", false);
+  addMessage("Hi! I'm Trippi. How can I help You?", false);
   input.focus();
 }

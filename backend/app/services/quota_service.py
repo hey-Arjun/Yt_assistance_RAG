@@ -1,7 +1,7 @@
 from datetime import date
 from fastapi import HTTPException
 
-QUERY_LIMIT = 10
+QUERY_LIMIT = 50
 
 # client_id -> {"date": date, "count": int}
 client_usage = {}
